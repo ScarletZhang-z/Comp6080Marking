@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchJson, goToStudent, badgeTone } from '../utils.js';
+import { fetchJson, badgeTone } from '../utils.js';
 
 export default function StudentsPage() {
   const [students, setStudents] = useState([]);
@@ -127,9 +127,14 @@ export default function StudentsPage() {
                       </span>
                     </td>
                     <td>
-                      <button className="primary-button" onClick={() => goToStudent(student.entity)}>
+                      <a
+                        className="primary-button"
+                        href={`#/student/z${student.entity}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
                         Mark
-                      </button>
+                      </a>
                     </td>
                   </tr>
                 ))}
