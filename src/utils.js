@@ -40,6 +40,10 @@ export function readRoute() {
     return { page: 'list' };
   }
 
+  if (hash === '/upload') {
+    return { page: 'upload' };
+  }
+
   const detailMatch = hash.match(/^\/student\/(z?\d+)$/);
 
   if (detailMatch) {
@@ -50,6 +54,10 @@ export function readRoute() {
   }
 
   return { page: 'list' };
+}
+
+export function goToUpload() {
+  window.location.hash = '/upload';
 }
 
 export function goToList() {

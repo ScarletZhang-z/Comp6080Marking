@@ -307,6 +307,35 @@ async function handleApi(request, response, url) {
     return true;
   }
 
+  if (request.method === 'POST' && url.pathname === '/api/upload') {
+    const body = await readBody(request);
+    const cookie = String(body.cookie ?? '').trim();
+    const scores = Array.isArray(body.scores) ? body.scores : [];
+    const results = [];
+
+    for (const score of scores) {
+      try {
+        const res = await fetch('https://cgi.cse.unsw.edu.au/~gitrun/api/submission/mark', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Cookie: cookie,
+          },
+          body: JSON.stringify(score),
+        });
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); } catch { data = { raw: text }; }
+        results.push({ submissionId: score.submissionId, ok: res.ok, status: res.status, data });
+      } catch (uploadError) {
+        results.push({ submissionId: score.submissionId, ok: false, error: uploadError.message });
+      }
+    }
+
+    sendJson(response, 200, { results });
+    return true;
+  }
+
   return false;
 }
 

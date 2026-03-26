@@ -60,6 +60,9 @@ a {
   backdrop-filter: blur(14px);
   background: rgba(247, 243, 234, 0.84);
   border-bottom: 1px solid rgba(61, 46, 18, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .brand {
@@ -143,6 +146,17 @@ a {
   gap: 1rem;
   justify-content: space-between;
   align-items: center;
+}
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--panel-strong);
+  border-bottom: 1px solid var(--line);
+  padding: 0.75rem 1rem;
+  margin: 0 -1rem;
+  backdrop-filter: blur(8px);
 }
 
 .export-panel {
@@ -334,6 +348,12 @@ tbody tr:last-child td {
 .notice.error {
   border-color: rgba(165, 38, 38, 0.18);
   color: #a52f2f;
+}
+
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 .input-stack {
