@@ -312,13 +312,16 @@ async function handleApi(request, response, url) {
     const cookie = String(body.cookie ?? '').trim();
     const scores = Array.isArray(body.scores) ? body.scores : [];
     const results = [];
-
+    console.log('<<<<<<<<<<<<<< cookie >>>>>>>>>>>>', cookie)
+    console.log('<<<<<<<<<<<<<< scores >>>>>>>>>>>>', scores)
     for (const score of scores) {
       try {
         const res = await fetch('https://cgi.cse.unsw.edu.au/~gitrun/api/submission/mark', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Accept': '*/*',
+            'x-gitrun-offering': 'COMP6080_26T1',
             Cookie: cookie,
           },
           body: JSON.stringify(score),
@@ -377,3 +380,4 @@ const server = http.createServer(async (request, response) => {
 server.listen(port, () => {
   console.log(`Marking tool running at http://localhost:${port}`);
 });
+
