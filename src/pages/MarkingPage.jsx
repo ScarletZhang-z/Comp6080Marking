@@ -180,7 +180,9 @@ export default function MarkingPage({ zid }) {
           <p className="eyebrow">Student Marking</p>
           <h1>{student.entityName ?? `z${normalizeZid(zid)}`}</h1>
           <p className="hero-copy">
-            {`z${student.entity}`} · {student.assignment}
+            <a href={`https://gitlab.cse.unsw.edu.au/coursework/COMP6080/26T1/students/z${student.entity}/formfiddle/-/blob/master/task1/src/script.js?ref_type=heads`}>
+             {`z${student.entity}`} · {student.assignment}
+            </a>
           </p>
         </div>
         <div className="detail-grid">

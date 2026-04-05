@@ -135,6 +135,10 @@ export default function StudentsPage() {
                       >
                         Mark
                       </a>
+
+                      <a href={`https://gitlab.cse.unsw.edu.au/coursework/COMP6080/26T1/students/z${student.entity}/formfiddle/-/blob/master/task1/src/script.js?ref_type=heads`}>
+                        Code
+                      </a>
                     </td>
                   </tr>
                 ))}
