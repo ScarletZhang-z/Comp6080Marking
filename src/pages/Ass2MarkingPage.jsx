@@ -15,9 +15,32 @@ import {
   serializeMark,
 } from '../utils.js';
 
+function NumberInput({ value, min, step, onCommit }) {
+  const [raw, setRaw] = useState(String(value));
+
+  useEffect(() => {
+    setRaw(String(value));
+  }, [value]);
+
+  return (
+    <input
+      type="number"
+      min={min}
+      step={step}
+      value={raw}
+      onChange={(e) => setRaw(e.target.value)}
+      onBlur={() => {
+        const rounded = roundMark(raw);
+        setRaw(String(rounded));
+        onCommit(rounded);
+      }}
+    />
+  );
+}
+
 const ORIGINAL_LOGIC_FIELDS = new Set(['ass3_git_score']);
 const CODE_STYLE_FIELDS = new Set(['ass3_code_style']);
-const HIDDEN_FIELDS = new Set(['ass3_other_penalty']);
+const PENALTY_FIELDS = new Set(['ass3_other_penalty']);
 
 function getCheckboxValues(min, max, granularity) {
   const values = [];
@@ -118,16 +141,25 @@ export default function Ass2MarkingPage({ zid }) {
             initManualComments[field] = stripSelectedComments(overallComment, selectedTexts);
           } else {
             initCheckboxMarks[field] = {};
+            const initDescriptions = [];
+            const isPenalty = PENALTY_FIELDS.has(field);
             for (const [key, schemaBD] of Object.entries(schemaEntry.breakdown ?? {})) {
-              if (HIDDEN_FIELDS.has(field)) {
-                initCheckboxMarks[field][key] = schemaBD.min;
-              } else {
-                const rawMark = blobEntry.breakdown?.[key]?.mark;
-                initCheckboxMarks[field][key] =
-                  rawMark !== undefined && rawMark !== '' ? parseFloat(rawMark) : schemaBD.max;
+              const rawMark = blobEntry.breakdown?.[key]?.mark;
+              const defaultMark = isPenalty ? schemaBD.min : schemaBD.max;
+              const mark =
+                rawMark !== undefined && rawMark !== '' ? parseFloat(rawMark) : defaultMark;
+              initCheckboxMarks[field][key] = mark;
+              const hasPenaltyApplied = isPenalty && mark > schemaBD.min + 1e-9;
+              const hasDeduction = !isPenalty && mark < schemaBD.max - 1e-9;
+              if (hasPenaltyApplied || hasDeduction) {
+                initDescriptions.push(`${key}: ${schemaBD.description}`);
               }
             }
-            initCbManualComments[field] = blobEntry.overallComment ?? '';
+            const initAutoComment = initDescriptions.join('\n');
+            const storedComment = blobEntry.overallComment ?? '';
+            initCbManualComments[field] = initAutoComment
+              ? storedComment.replace(initAutoComment, '').trim()
+              : storedComment.trim();
           }
         }
 
@@ -193,7 +225,7 @@ export default function Ass2MarkingPage({ zid }) {
         const max = schemaEntry.breakdown?.['code style']?.max ?? 10;
         const reduction = getSelectedReduction(commentIndex, selectedComments, field, 'codequality');
         total += roundMark(max - reduction);
-      } else {
+      } else if (!PENALTY_FIELDS.has(field)) {
         for (const [key, schemaBD] of Object.entries(schemaEntry.breakdown ?? {})) {
           total += checkboxMarks[field]?.[key] ?? schemaBD.max;
         }
@@ -245,14 +277,17 @@ export default function Ass2MarkingPage({ zid }) {
         const overallComment = composeOverallComment(manualComments[field], selectedTexts);
         return { field, overallComment, breakdown };
       } else {
+        const isPenalty = PENALTY_FIELDS.has(field);
         const descriptions = [];
         for (const [key, schemaBD] of Object.entries(schemaEntry.breakdown ?? {})) {
-          const mark = checkboxMarks[field]?.[key] ?? schemaBD.max;
+          const mark = checkboxMarks[field]?.[key] ?? (isPenalty ? schemaBD.min : schemaBD.max);
           breakdown[key] = {
             comment: blobEntry.breakdown?.[key]?.comment ?? '',
             mark: serializeMark(mark),
           };
-          if (mark < schemaBD.max - 1e-9) {
+          const hasPenaltyApplied = isPenalty && mark > schemaBD.min + 1e-9;
+          const hasDeduction = !isPenalty && mark < schemaBD.max - 1e-9;
+          if (hasPenaltyApplied || hasDeduction) {
             descriptions.push(`${key}: ${schemaBD.description}`);
           }
         }
@@ -391,7 +426,6 @@ export default function Ass2MarkingPage({ zid }) {
 
       {(schema ?? []).map((schemaEntry) => {
         const field = schemaEntry.field_name;
-        if (HIDDEN_FIELDS.has(field)) return null;
         const isOriginal = ORIGINAL_LOGIC_FIELDS.has(field);
 
         if (isOriginal) {
@@ -559,10 +593,13 @@ export default function Ass2MarkingPage({ zid }) {
         }
 
         // Checkbox logic: staircase checkboxes based on min/max/granularity
+        const isPenaltyField = PENALTY_FIELDS.has(field);
         const descriptions = [];
         for (const [key, schemaBD] of Object.entries(schemaEntry.breakdown ?? {})) {
-          const mark = checkboxMarks[field]?.[key] ?? schemaBD.max;
-          if (mark < schemaBD.max - 1e-9) {
+          const mark = checkboxMarks[field]?.[key] ?? (isPenaltyField ? schemaBD.min : schemaBD.max);
+          const hasPenaltyApplied = isPenaltyField && mark > schemaBD.min + 1e-9;
+          const hasDeduction = !isPenaltyField && mark < schemaBD.max - 1e-9;
+          if (hasPenaltyApplied || hasDeduction) {
             descriptions.push(`${key}: ${schemaBD.description}`);
           }
         }
@@ -595,7 +632,7 @@ export default function Ass2MarkingPage({ zid }) {
               {Object.entries(schemaEntry.breakdown ?? {}).map(([key, schemaBD]) => {
                 const { min, max, granularity } = schemaBD;
                 const values = getCheckboxValues(min, max, granularity);
-                const currentMark = checkboxMarks[field]?.[key] ?? max;
+                const currentMark = checkboxMarks[field]?.[key] ?? (isPenaltyField ? min : max);
 
                 return (
                   <article className="breakdown-card" key={`${field}-${key}`}>

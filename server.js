@@ -132,8 +132,11 @@ function normalizeScoreRecord(score, recid) {
   const normalized = deepClone(score);
   const submissionId = recid ?? normalized.submissionId ?? '';
   normalized.submissionId = normalizeRecid(submissionId);
-  normalized.markingStructure = Array.isArray(normalized.markingStructure)
+  const markingBlob = normalized.submission?.marking_blob;
+  normalized.markingStructure = Array.isArray(normalized.markingStructure) && normalized.markingStructure.length > 0
     ? normalized.markingStructure
+    : Array.isArray(markingBlob)
+    ? markingBlob
     : [];
   normalized.markingStatus = normalized.markingStatus ?? 'Completed';
   return normalized;
