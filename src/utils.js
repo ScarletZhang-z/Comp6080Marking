@@ -44,7 +44,7 @@ export function readRoute() {
     return { page: 'upload' };
   }
 
-  const detailMatch = hash.match(/^\/student\/(z?\d+)$/);
+  const detailMatch = hash.match(/^\/student\/(z?\w+)$/);
 
   if (detailMatch) {
     return {

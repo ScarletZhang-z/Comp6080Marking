@@ -258,7 +258,7 @@ async function handleApi(request, response, url) {
     return true;
   }
 
-  const markingMatch = url.pathname.match(/^\/api\/students\/(z?\d+)\/marking$/);
+  const markingMatch = url.pathname.match(/^\/api\/students\/(z?\w+)\/marking$/);
 
   if (request.method === 'GET' && markingMatch) {
     const zid = normalizeZid(markingMatch[1]);
@@ -285,7 +285,7 @@ async function handleApi(request, response, url) {
     return true;
   }
 
-  const scoreMatch = url.pathname.match(/^\/api\/students\/(z?\d+)\/score$/);
+  const scoreMatch = url.pathname.match(/^\/api\/students\/(z?\w+)\/score$/);
 
   if (request.method === 'POST' && scoreMatch) {
     const zid = normalizeZid(scoreMatch[1]);
