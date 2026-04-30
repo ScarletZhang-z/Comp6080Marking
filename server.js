@@ -12,7 +12,7 @@ const commentsPath = path.join(dataDir, 'comments.json');
 const studentsPath = path.join(dataDir, 'students.json');
 const scoresDir = path.join(dataDir, 'scores');
 const distDir = path.join(rootDir, 'dist');
-const port = Number(process.env.PORT || 3000);
+const port = Number(process.env.PORT || 1210);
 const isProduction = process.env.NODE_ENV === 'production';
 const defaultExportPath = 'data/exported-scores.json';
 
@@ -132,7 +132,7 @@ function normalizeScoreRecord(score, recid) {
   const normalized = deepClone(score);
   const submissionId = recid ?? normalized.submissionId ?? '';
   normalized.submissionId = normalizeRecid(submissionId);
-  const markingBlob = normalized.submission?.marking_blob;
+  const markingBlob = normalized.submission?.marking_blob ?? normalized.marking_blob;
   normalized.markingStructure = Array.isArray(normalized.markingStructure) && normalized.markingStructure.length > 0
     ? normalized.markingStructure
     : Array.isArray(markingBlob)

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { readRoute, goToUpload } from './utils.js';
 import StudentsPage from './pages/StudentsPage.jsx';
-import MarkingPage from './pages/Ass2MarkingPage.jsx';
+import MarkingPage from './pages/MarkingPage.jsx';
 import UploadPage from './pages/UploadPage.jsx';
 
 export default function App() {
