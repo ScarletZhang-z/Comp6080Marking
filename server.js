@@ -5,10 +5,12 @@ import { fileURLToPath } from 'node:url';
 
 import { createServer as createViteServer } from 'vite';
 
+const ass = 'ass4'
+
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.join(rootDir, 'data');
-const scoreTemplatePath = path.join(dataDir, 'score.json');
-const commentsPath = path.join(dataDir, 'comments.json');
+const scoreTemplatePath = path.join(dataDir, `score_${ass}.json`);
+const commentsPath = path.join(dataDir, `comments_${ass}.json`);
 const studentsPath = path.join(dataDir, 'students.json');
 const scoresDir = path.join(dataDir, 'scores');
 const distDir = path.join(rootDir, 'dist');

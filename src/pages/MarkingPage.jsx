@@ -39,7 +39,7 @@ function NumberInput({ value, min, step, onCommit }) {
 }
 
 const ORIGINAL_LOGIC_FIELDS = new Set(['ass4_git_score']);
-const CODE_STYLE_FIELDS = new Set([]);
+const CODE_STYLE_FIELDS = new Set(['ass4_code_style']);
 const PENALTY_FIELDS = new Set(['ass4_other_penalty']);
 
 function getCheckboxValues(min, max, granularity) {
@@ -222,7 +222,7 @@ export default function Ass2MarkingPage({ zid }) {
           total += roundMark(baseMark - reduction);
         }
       } else if (CODE_STYLE_FIELDS.has(field)) {
-        const max = schemaEntry.breakdown?.['code style']?.max ?? 10;
+        const max = schemaEntry.breakdown?.['style']?.max ?? 10;
         const reduction = getSelectedReduction(commentIndex, selectedComments, field, 'codequality');
         total += roundMark(max - reduction);
       } else if (!PENALTY_FIELDS.has(field)) {
@@ -264,10 +264,10 @@ export default function Ass2MarkingPage({ zid }) {
         const overallComment = composeOverallComment(manualComments[field], selectedTexts);
         return { field, overallComment, breakdown };
       } else if (CODE_STYLE_FIELDS.has(field)) {
-        const max = schemaEntry.breakdown?.['code style']?.max ?? 10;
+        const max = schemaEntry.breakdown?.['style']?.max ?? 10;
         const reduction = getSelectedReduction(commentIndex, selectedComments, field, 'codequality');
-        breakdown['code style'] = {
-          comment: blobEntry.breakdown?.['code style']?.comment ?? '',
+        breakdown['style'] = {
+          comment: blobEntry.breakdown?.['style']?.comment ?? '',
           mark: serializeMark(roundMark(max - reduction)),
         };
         const options = getCommentOptions(commentIndex, field, 'codequality');
@@ -537,7 +537,7 @@ export default function Ass2MarkingPage({ zid }) {
         }
 
         if (CODE_STYLE_FIELDS.has(field)) {
-          const max = schemaEntry.breakdown?.['code style']?.max ?? 10;
+          const max = schemaEntry.breakdown?.['style']?.max ?? 10;
           const options = getCommentOptions(commentIndex, field, 'codequality');
           const reduction = getSelectedReduction(commentIndex, selectedComments, field, 'codequality');
           const visibleMark = roundMark(max - reduction);
