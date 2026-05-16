@@ -144,8 +144,32 @@ function normalizeScoreRecord(score, recid) {
   return normalized;
 }
 
+function normalizeStudentRecord(record) {
+  // Normalize entityNames (array or string) → entityName (string)
+  const rawNames = record.entityNames ?? record.entityName ?? '';
+  const entityName = Array.isArray(rawNames) ? rawNames.join(', ') : String(rawNames);
+
+  if (record.entity !== undefined) {
+    return { ...record, entityName };
+  }
+  // Handle simple format: {submissionId, markingStructure, ...}
+  return {
+    entity: record.submissionId ?? '',
+    recid: record.submissionId ?? '',
+    entityName,
+    assignment: 'Exam',
+    marking_status: record.markingStatus ?? 'Todo',
+    days_late: 0,
+    extension_hours: 0,
+    ...record,
+    entityName,
+  };
+}
+
 async function loadStudents() {
-  return readJson(studentsPath);
+  const data = await readJson(studentsPath);
+  const arr = Array.isArray(data) ? data : [data];
+  return arr.map(normalizeStudentRecord);
 }
 
 async function loadCommentsTemplate() {
@@ -158,7 +182,10 @@ async function loadScoreTemplate() {
 
 async function getStudentRecord(zid) {
   const students = await loadStudents();
-  return students.find((student) => normalizeZid(student.entity) === normalizeZid(zid)) ?? null;
+  return students.find((student) =>
+    normalizeZid(student.entity) === normalizeZid(zid) ||
+    normalizeZid(student.submissionId) === normalizeZid(zid)
+  ) ?? null;
 }
 
 async function initializeStudentScore(zid, recid) {
@@ -273,15 +300,17 @@ async function handleApi(request, response, url) {
       return true;
     }
 
-    const [score, comments] = await Promise.all([
+    const [score, comments, scoreTemplate] = await Promise.all([
       initializeStudentScore(zid, student.recid),
       loadCommentsTemplate(),
+      loadScoreTemplate(),
     ]);
 
     sendJson(response, 200, {
       student,
       score,
       comments,
+      scoreTemplate,
       defaultExportPath,
     });
     return true;

@@ -398,7 +398,7 @@ textarea:focus {
 .breakdown-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr  1fr;
 }
 
 .breakdown-card {
@@ -420,6 +420,44 @@ textarea:focus {
   color: var(--accent-deep);
   white-space: nowrap;
   align-self: flex-start;
+}
+
+.section-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.zero-button,
+.max-button {
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.zero-button {
+  border: 1px solid rgba(165, 38, 38, 0.25);
+  color: #a52f2f;
+  background: rgba(165, 38, 38, 0.07);
+}
+
+.zero-button:hover {
+  background: rgba(165, 38, 38, 0.14);
+  transform: translateY(-1px);
+}
+
+.max-button {
+  border: 1px solid rgba(47, 108, 69, 0.25);
+  color: var(--success);
+  background: rgba(47, 108, 69, 0.07);
+}
+
+.max-button:hover {
+  background: rgba(47, 108, 69, 0.14);
+  transform: translateY(-1px);
 }
 
 .checkbox-stack {
